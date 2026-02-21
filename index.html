@@ -383,31 +383,45 @@ function sortItems(items) {
   }
 
   async function updateEntry(id, updates) {
-    const { data, error } = await db
+    const { error: updateError } = await db
       .from("glitches")
       .update(updates)
+      .eq("id", id);
+    if (updateError) {
+      console.error(updateError);
+      els.status.innerHTML =
+        `<div class="error"><strong>Save failed:</strong> ${escapeHtml(updateError.message || String(updateError))}</div>`;
+      return false;
+    }
+
+    const { data: fresh, error: readError } = await db
+      .from("glitches")
+      .select("id,title,author,url,notes,tags,added_at")
       .eq("id", id)
-      .select("id")
       .maybeSingle();
-    if (error) {
-      console.error(error);
+    if (readError || !fresh) {
+      console.error(readError || "Missing updated row");
       els.status.innerHTML =
-        `<div class="error"><strong>Save failed:</strong> ${escapeHtml(error.message || String(error))}</div>`;
-      setTimeout(() => { if (els.status.innerHTML.includes("Save failed:")) els.status.innerHTML = ""; }, 5000);
-      renderTable();
-      return;
+        `<div class="error"><strong>Save failed:</strong> Could not verify the updated row.</div>`;
+      return false;
     }
-    if (!data) {
+
+    const normalized = (v) => JSON.stringify(v ?? null);
+    const applied = Object.entries(updates).every(([k, v]) => normalized(fresh[k]) === normalized(v));
+    if (!applied) {
       els.status.innerHTML =
-        `<div class="error"><strong>Save failed:</strong> No row was updated. Check Supabase RLS update policy for this table.</div>`;
-      setTimeout(() => { if (els.status.innerHTML.includes("Save failed:")) els.status.innerHTML = ""; }, 7000);
-      renderTable();
-      return;
+        `<div class="error"><strong>Save failed:</strong> Update did not persist. Check Supabase RLS update policy for this table.</div>`;
+      return false;
     }
-    const item = state.raw.find((r) => String(r.id) === String(id));
-    if (item) Object.assign(item, updates);
+
+    const rawItem = state.raw.find((r) => String(r.id) === String(id));
+    if (rawItem) Object.assign(rawItem, fresh);
+    const filteredItem = state.filtered.find((r) => String(r.id) === String(id));
+    if (filteredItem && filteredItem !== rawItem) Object.assign(filteredItem, fresh);
+
     els.status.innerHTML = "";
     renderTable();
+    return true;
   }
 
   els.tbody.addEventListener("click", (e) => {
