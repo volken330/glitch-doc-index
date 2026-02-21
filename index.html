@@ -15,9 +15,12 @@
     button { padding: 10px 12px; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(127,127,127,0.25); vertical-align: top; }
-    td.editable { display: flex; align-items: flex-start; gap: 6px; }
+    td.editable .editable-wrap { display: flex; align-items: flex-start; gap: 6px; }
     td.editable .cell-content { flex: 1; min-width: 0; }
     td.editable input, td.editable textarea { width: 100%; padding: 6px 8px; font: inherit; box-sizing: border-box; }
+    .title-edit { display: grid; gap: 6px; width: 100%; }
+    .title-edit-row { display: flex; gap: 6px; }
+    .title-edit-row button { padding: 6px 10px; font-size: 12px; }
     .edit-btn { padding: 2px 6px; font-size: 12px; opacity: 0.6; cursor: pointer; border: none; background: transparent; flex-shrink: 0; }
     .edit-btn:hover { opacity: 1; }
     th { position: sticky; top: 0; background: canvas; }
@@ -264,10 +267,10 @@ function sortItems(items) {
 
       return `
         <tr data-id="${escapeHtml(id)}">
-          <td class="editable" data-field="title"><span class="cell-content">${titleCell}</span>${editBtn("title", "title")}</td>
-          <td class="editable" data-field="author"><span class="cell-content">${author || '<span class="muted">—</span>'}</span>${editBtn("author", "author")}</td>
-          <td class="editable" data-field="notes"><span class="cell-content">${notes || '<span class="muted">—</span>'}</span>${editBtn("notes", "notes")}</td>
-          <td class="editable" data-field="tags"><span class="cell-content">${tagsHtml || '<span class="muted">—</span>'}</span>${editBtn("tags", "tags")}</td>
+          <td class="editable" data-field="title"><div class="editable-wrap"><span class="cell-content">${titleCell}</span>${editBtn("title", "title")}</div></td>
+          <td class="editable" data-field="author"><div class="editable-wrap"><span class="cell-content">${author || '<span class="muted">—</span>'}</span>${editBtn("author", "author")}</div></td>
+          <td class="editable" data-field="notes"><div class="editable-wrap"><span class="cell-content">${notes || '<span class="muted">—</span>'}</span>${editBtn("notes", "notes")}</div></td>
+          <td class="editable" data-field="tags"><div class="editable-wrap"><span class="cell-content">${tagsHtml || '<span class="muted">—</span>'}</span>${editBtn("tags", "tags")}</div></td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
         </tr>
       `;
@@ -278,6 +281,71 @@ function sortItems(items) {
   }
 
   function startEdit(cell, itemId, field, currentValue) {
+    if (field === "title") {
+      const currentTitle = String(currentValue?.title || "");
+      const currentUrl = String(currentValue?.url || "");
+      const wrap = document.createElement("div");
+      wrap.className = "title-edit";
+
+      const titleInput = document.createElement("input");
+      titleInput.type = "text";
+      titleInput.placeholder = "Title";
+      titleInput.value = currentTitle;
+
+      const urlInput = document.createElement("input");
+      urlInput.type = "url";
+      urlInput.placeholder = "https://...";
+      urlInput.value = currentUrl;
+
+      const actions = document.createElement("div");
+      actions.className = "title-edit-row";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.type = "button";
+      saveBtn.textContent = "Save";
+
+      const cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.textContent = "Cancel";
+
+      actions.appendChild(saveBtn);
+      actions.appendChild(cancelBtn);
+      wrap.appendChild(titleInput);
+      wrap.appendChild(urlInput);
+      wrap.appendChild(actions);
+      cell.innerHTML = "";
+      cell.appendChild(wrap);
+      titleInput.focus();
+      titleInput.select();
+
+      async function saveTitleEdit() {
+        const nextTitle = titleInput.value.trim();
+        const nextUrl = urlInput.value.trim();
+        if (!nextTitle) return titleInput.focus();
+        if (!nextUrl) return urlInput.focus();
+        try { new URL(nextUrl); } catch { return urlInput.focus(); }
+
+        if (nextTitle === currentTitle && nextUrl === currentUrl) {
+          renderTable();
+          return;
+        }
+        await updateEntry(itemId, { title: nextTitle, url: nextUrl });
+      }
+
+      saveBtn.addEventListener("click", saveTitleEdit);
+      cancelBtn.addEventListener("click", () => renderTable());
+      wrap.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          e.preventDefault();
+          renderTable();
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          saveTitleEdit();
+        }
+      });
+      return;
+    }
+
     const isTags = field === "tags";
     const current = isTags
       ? normalizeArray(currentValue).join(", ")
@@ -296,7 +364,7 @@ function sortItems(items) {
       const newVal = el.value.trim();
       const oldVal = isTags ? normalizeArray(currentValue).join(", ") : String(currentValue || "");
       if (newVal !== oldVal) {
-        updateEntry(itemId, field, isTags ? parseTagsCsv(newVal) : newVal);
+        updateEntry(itemId, { [field]: isTags ? parseTagsCsv(newVal) : newVal });
       } else {
         renderTable();
       }
@@ -314,16 +382,15 @@ function sortItems(items) {
     });
   }
 
-  async function updateEntry(id, field, value) {
-    const payload = { [field]: value };
-    const { error } = await db.from("glitches").update(payload).eq("id", id);
+  async function updateEntry(id, updates) {
+    const { error } = await db.from("glitches").update(updates).eq("id", id);
     if (error) {
       console.error(error);
       renderTable();
       return;
     }
     const item = state.raw.find((r) => String(r.id) === String(id));
-    if (item) item[field] = value;
+    if (item) Object.assign(item, updates);
     renderTable();
   }
 
@@ -340,7 +407,9 @@ function sortItems(items) {
     if (!field) return;
     const item = state.raw.find((r) => String(r.id) === itemId) || state.filtered.find((r) => String(r.id) === itemId);
     if (!item) return;
-    const currentValue = item[field];
+    const currentValue = field === "title"
+      ? { title: item.title, url: item.url }
+      : item[field];
     startEdit(cell, itemId, field, currentValue);
   });
 
