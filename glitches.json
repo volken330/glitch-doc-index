@@ -3,14 +3,606 @@
   "updated_at": "2026-02-21T00:00:00Z",
   "glitches": [
     {
-      "id": "megaflip",
-      "title": "Megaflip",
-      "url": "https://gist.github.com/USERNAME/GIST_ID",
-      "author": "SomeUser",
-      "tags": ["movement", "damage-boost", "speedrun"],
-      "added_at": "2026-02-21T00:00:00Z",
-      "added_by": "discord:123456789012345678",
-      "notes": "Root-cause walkthrough with call order + key variables."
+      "id": "how-the-lakeside-lab-dive-works-and-hookshot-trick",
+      "title": "How the Lakeside Lab dive works (and hookshot trick)",
+      "url": "https://pastebin.com/FhGJMwEV",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "equip-swap-explained",
+      "title": "Equip swap explained",
+      "url": "https://pastebin.com/j6XbtYSU",
+      "author": "Exodus122",
+      "tags": ["equip swap"]
+    },
+    {
+      "id": "inventory-diagonal-inputs-explained",
+      "title": "Inventory: Diagonal Inputs explained",
+      "url": "https://pastebin.com/4z4eKsZ9",
+      "author": "Exodus122",
+      "tags": ["inventory"]
+    },
+    {
+      "id": "crawlspace-interrupt-with-text-box-explanation-for-blank-a",
+      "title": "Crawlspace interrupt with text box explanation (for Blank A)",
+      "url": "https://pastebin.com/xwndUmE1",
+      "author": "Exodus122",
+      "tags": ["crawlspace"]
+    },
+    {
+      "id": "button-dimming-logic",
+      "title": "Button dimming logic",
+      "url": "https://pastebin.com/QkLD3N58",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "glitched-damage-value-quick-putaway-burning-stick",
+      "title": "Glitched Damage Value (Quick Putaway/Burning Stick)",
+      "url": "https://pastebin.com/nmNF9698",
+      "author": "Exodus122",
+      "tags": ["QPA"]
+    },
+    {
+      "id": "zoras-domain-diving-minigame-rupee-odds",
+      "title": "Zora's Domain Diving Minigame - Rupee Odds",
+      "url": "https://pastebin.com/1Mbxei5d",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "power-crouch-stab-explained",
+      "title": "Power Crouch Stab explained",
+      "url": "https://pastebin.com/Q0rmVYq9",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "why-some-items-get-written-to-unusual-slots",
+      "title": "Why some items get written to unusual slots",
+      "url": "https://pastebin.com/uniACRkn",
+      "author": "Exodus122",
+      "tags": ["inventory"]
+    },
+    {
+      "id": "fishing-documentation",
+      "title": "Fishing Documentation",
+      "url": "https://pastebin.com/WQrpxRCM",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "glitched-item-actions",
+      "title": "Glitched Item Actions",
+      "url": "https://pastebin.com/khnFCw4K",
+      "author": "Exodus122",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "navi-notes",
+      "title": "Navi notes",
+      "url": "https://pastebin.com/MR6gyqWJ",
+      "author": "Exodus122",
+      "tags": ["Navi"]
+    },
+    {
+      "id": "notes-on-hookshot-oddity-for-item-duping",
+      "title": "Notes on Hookshot oddity for item duping",
+      "url": "https://pastebin.com/WqXqx4Be",
+      "author": "Exodus122",
+      "tags": ["inventory"]
+    },
+    {
+      "id": "time-of-day",
+      "title": "Time of Day",
+      "url": "https://pastebin.com/HMB7T8Hq",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "pointers-to-actor-cutscenes-v1-0",
+      "title": "Pointers to Actor Cutscenes (v1.0)",
+      "url": "https://pastebin.com/5fCtPkqj",
+      "author": "Exodus122",
+      "tags": ["Actors", "cutscene"]
+    },
+    {
+      "id": "bomb-hess-frame-data",
+      "title": "Bomb HESS Frame Data",
+      "url": "https://pastebin.com/z4CBYvbS",
+      "author": "Exodus122",
+      "tags": ["HESS"]
+    },
+    {
+      "id": "warp-song-entrance-wrong-warps",
+      "title": "Warp Song Entrance Wrong Warps",
+      "url": "https://pastebin.com/VKM4FP9j",
+      "author": "Exodus122",
+      "tags": ["WW"]
+    },
+    {
+      "id": "jabu-wrong-warp-theoretical-destinations",
+      "title": "Jabu Wrong Warp Theoretical destinations",
+      "url": "https://pastebin.com/c60N6t9Z",
+      "author": "Exodus122",
+      "tags": ["WW"]
+    },
+    {
+      "id": "cutscene-only-entrances",
+      "title": "Cutscene-only entrances",
+      "url": "https://pastebin.com/s5Aigfve",
+      "author": "Exodus122",
+      "tags": ["cutscene"]
+    },
+    {
+      "id": "oot-grottos",
+      "title": "OoT Grottos",
+      "url": "https://pastebin.com/G33N2E0Y",
+      "author": "Exodus122",
+      "tags": []
+    },
+    {
+      "id": "gim-tables-for-all-versions",
+      "title": "GIM Tables for all versions",
+      "url": "https://docs.google.com/spreadsheets/d/1SLJzamokLb7wDOaJh5x8DsxmMBy9oIYawyDN3dAWppw/edit",
+      "author": "Exodus122",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "modify-chest-contents-with-z-coordinates",
+      "title": "Modify Chest contents with z coordinates",
+      "url": "https://docs.google.com/spreadsheets/d/1EvDpVxGHbD1DgNIdDro1x9Cb4SfP5Roc5ElsX1SrKNU/edit?usp=drivesdk",
+      "author": "Exodus122",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "item-chart-with-version-differences",
+      "title": "Item Chart with version differences",
+      "url": "https://docs.google.com/spreadsheets/d/1xnnnWGMQckNOzamxZENF9hurLahkfsHlfmMLNodS5RA/edit",
+      "author": "Exodus122",
+      "tags": ["inventory"]
+    },
+    {
+      "id": "void-warp-locations",
+      "title": "Void Warp Locations",
+      "url": "https://docs.google.com/spreadsheets/d/1vaxR8bu62UI_B7_Up7hH6LYRCYBvZRTaLX2vIFuSj_c/edit",
+      "author": "Exodus122",
+      "tags": ["Void Warp"]
+    },
+    {
+      "id": "linked-cutscene-wrong-warp-notes",
+      "title": "Linked Cutscene Wrong Warp Notes",
+      "url": "https://docs.google.com/spreadsheets/d/1WH2Y4tu4D4IYKCLBOUa1eOwC-qNLgX_8UYhBfQMQyQg/edit",
+      "author": "Exodus122",
+      "tags": ["cutscene", "WW"]
+    },
+    {
+      "id": "linked-cutscene-wrong-warp-potential-destinations",
+      "title": "Linked Cutscene Wrong Warp Potential Destinations",
+      "url": "https://docs.google.com/spreadsheets/d/1CrExlJyUfzPRdQzBfWo27N_AzSMsGpjyxr_oAmlEpiE/edit",
+      "author": "Jolin",
+      "tags": ["cutscene", "WW"]
+    },
+    {
+      "id": "original-gim-table",
+      "title": "Original GIM Table",
+      "url": "https://docs.google.com/spreadsheets/d/1iC55h-oy3NAIW739yNQ8Cg9QNpDGTyVRys_NLHpnG_o/edit",
+      "author": "mzxrules",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "linear-velocity-clips",
+      "title": "Linear Velocity Clips",
+      "url": "https://docs.google.com/spreadsheets/d/1nidLZ2g8772G0CX_duyJDP6-77xKOwbxB-RTtamMCeA/edit",
+      "author": "mzxrules",
+      "tags": ["clip"]
+    },
+    {
+      "id": "player-states-list",
+      "title": "Player States list",
+      "url": "https://docs.google.com/spreadsheets/d/1YodOXyMM59kuMW6RiBWeGvIzmUVTqjT7FLQlwMzA4z8/edit",
+      "author": "mzxrules",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "switch-flags",
+      "title": "Switch Flags",
+      "url": "https://docs.google.com/spreadsheets/d/1LRaJHrOCvE5GNwEWhHtf8WRAcYs1xAMxl1ysOGdUP1E/edit#",
+      "author": "mzxrules",
+      "tags": ["Flags"]
+    },
+    {
+      "id": "hold-r-explained",
+      "title": "Hold R explained",
+      "url": "https://pastebin.com/62sQesUx",
+      "author": "mzxrules",
+      "tags": []
+    },
+    {
+      "id": "gim-explained",
+      "title": "GIM explained",
+      "url": "https://pastebin.com/fJQsphHG",
+      "author": "mzxrules",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "ground-clip-floors",
+      "title": "Ground Clip Floors",
+      "url": "https://docs.google.com/spreadsheets/d/1WGV_hcbq-eTsE1QndpRpAKHIJtdOoArSkgpOC016xc0/edit",
+      "author": "blini",
+      "tags": ["clip"]
+    },
+    {
+      "id": "action-swap-combination-chart",
+      "title": "Action Swap Combination Chart",
+      "url": "https://docs.google.com/spreadsheets/d/1kkTjpibGjiKcjZ_0q8g38tKjG2c2L8aKoBNwEKAElnE/edit#gid=0",
+      "author": "mubbsy",
+      "tags": ["action swap"]
+    },
+    {
+      "id": "damage-charts",
+      "title": "Damage Charts",
+      "url": "https://docs.google.com/spreadsheets/d/1pXvFipVwQPoD4MCuUij8CLLZ_P7np4aNdgn1f8ziXso/edit",
+      "author": "Aria Tanner",
+      "tags": []
+    },
+    {
+      "id": "all-permanent-flags",
+      "title": "All Permanent Flags",
+      "url": "https://docs.google.com/spreadsheets/d/1CyaDpxY2lMq3_j6nqI3uzHUt0pl5r36kzpOv069d_Ms/edit",
+      "author": "Aria Tanner",
+      "tags": ["Flags"]
+    },
+    {
+      "id": "glitch-trick-discovery-list-by-date",
+      "title": "Glitch/Trick Discovery List By Date",
+      "url": "https://docs.google.com/document/d/1KymmXOp-b_PA4ErWX70VRV5TcpbC5Nh6espdCOlwtd0/edit?tab=t.0",
+      "author": "",
+      "tags": []
+    },
+    {
+      "id": "rba-list-for-items-0-255",
+      "title": "RBA List for Items 0-255",
+      "url": "https://docs.google.com/spreadsheets/d/1O3pZEEO8Hza7BEjXtN5iqYJwlemXRAllXQvOL6qGUlw/edit",
+      "author": "",
+      "tags": ["RBA", "inventory"]
+    },
+    {
+      "id": "original-fw-wrong-warp-testing-sheet",
+      "title": "Original FW Wrong Warp Testing Sheet",
+      "url": "https://docs.google.com/spreadsheets/d/17Jm6501JMF6x4YUs0I8rrUWCUdsIhvauhZJV8yRjVFk/edit",
+      "author": "",
+      "tags": ["FW", "WW"]
+    },
+    {
+      "id": "temp-flags",
+      "title": "Temp Flags",
+      "url": "https://docs.google.com/spreadsheets/d/1i9Fsy1osyfw2Wf0PAjol7f2fWXfvW7l4yaHvS7N0LeM/edit?usp=drivesdk",
+      "author": "",
+      "tags": ["Flags"]
+    },
+    {
+      "id": "z-player-c-documentation",
+      "title": "z_player.c documentation",
+      "url": "https://docs.google.com/spreadsheets/d/1W7QQFoaVz4cEWm-jfQUfN05QriI1YBLKZXL4qLXwOFk/edit?gid=664420014#gid=664420014",
+      "author": "",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "exit-dumps-v2-wip",
+      "title": "exit dumps v2 wip",
+      "url": "https://docs.google.com/spreadsheets/d/1Fu6HVTyEjKiHP4qbH7l-6qv9c-etIJZSLGDedDU7mPg/edit?gid=173124518#gid=173124518",
+      "author": "",
+      "tags": ["Exits"]
+    },
+    {
+      "id": "practice-rom-watches-and-flags",
+      "title": "Practice ROM - Watches and flags",
+      "url": "https://docs.google.com/spreadsheets/d/1xKMd4W9tVhPHbT5BeZx4eEYZSdj685ClTXY6dFURN-E/edit",
+      "author": "zfg",
+      "tags": ["Flags"]
+    },
+    {
+      "id": "deku-nut-upgrade-dupe-explanation",
+      "title": "Deku nut upgrade dupe explanation",
+      "url": "https://gist.github.com/volken330/f7c7f5bec22c6f838e0038e5587aaf8c",
+      "author": "volken330",
+      "tags": ["inventory"]
+    },
+    {
+      "id": "room-overlaps-for-all-versions",
+      "title": "Room overlaps for all versions",
+      "url": "https://pastebin.com/CtxnKuH1",
+      "author": "MrCheeze",
+      "tags": ["Rooms"]
+    },
+    {
+      "id": "room-buffer-size-all-versions",
+      "title": "Room Buffer Size (all versions)",
+      "url": "https://pastebin.com/c61xWJAJ",
+      "author": "MrCheeze",
+      "tags": ["Rooms"]
+    },
+    {
+      "id": "bg-actors-next-to-black-load-planes",
+      "title": "BG Actors next to black load planes",
+      "url": "https://pastebin.com/m2Rdbyfi",
+      "author": "MrCheeze",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "symbols-for-achievable-entrances-all-versions-except-ique",
+      "title": "Symbols for achievable entrances (all versions except IQue)",
+      "url": "https://pastebin.com/5mL6QaZf",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "actor-dynapolies",
+      "title": "Actor dynapolies",
+      "url": "https://pastebin.com/fre2nviT",
+      "author": "MrCheeze",
+      "tags": ["Dynapoly", "Actors"]
+    },
+    {
+      "id": "scene-exits-including-cutscene-setups",
+      "title": "Scene Exits including cutscene setups",
+      "url": "https://pastebin.com/pixWz35Z",
+      "author": "MrCheeze",
+      "tags": ["Scenes", "Exits", "cutscene"]
+    },
+    {
+      "id": "shooting-gallery-exits-per-spawn-gc-ce",
+      "title": "Shooting Gallery Exits per spawn (GC CE)",
+      "url": "https://pastebin.com/8jusMn0w",
+      "author": "MrCheeze",
+      "tags": ["Exits", "Scenes"]
+    },
+    {
+      "id": "all-noncrashing-dynawarps-gc-jp-ce",
+      "title": "All noncrashing dynawarps (GC JP CE)",
+      "url": "https://pastebin.com/zZ3eXYqs",
+      "author": "MrCheeze",
+      "tags": ["Dynawarp"]
+    },
+    {
+      "id": "scene-exits",
+      "title": "Scene exits",
+      "url": "https://pastebin.com/Xejn755N",
+      "author": "MrCheeze",
+      "tags": ["Scenes", "Exits"]
+    },
+    {
+      "id": "all-theoretical-lightnode-srm-actors",
+      "title": "All theoretical LightNode SRM actors",
+      "url": "https://pastebin.com/3Sf34D8D",
+      "author": "MrCheeze",
+      "tags": ["SRM", "Actors"]
+    },
+    {
+      "id": "gid-noncrashing-pointer-corruption",
+      "title": "GID noncrashing pointer corruption",
+      "url": "https://pastebin.com/1qvMP0uu",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "nontrivial-noncrashing-get-item-delays",
+      "title": "Nontrivial noncrashing Get Item Delays",
+      "url": "https://pastebin.com/V6uw9RTP",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "getitem-object-sizes-and-valid-dlist-ranges",
+      "title": "GetItem object sizes and valid dlist ranges",
+      "url": "https://pastebin.com/RPMzF9KW",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "entrance-dump-ntsc",
+      "title": "Entrance dump ntsc",
+      "url": "https://pastebin.com/t9QQ1H40",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "entrance-dump-ntsc-1",
+      "title": "Entrance dump ntsc 1",
+      "url": "https://pastebin.com/VyQVm462",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "solid-buffer-pixels-for-exit-1e00",
+      "title": "Solid buffer pixels for exit 1E00",
+      "url": "https://pastebin.com/V7T53Fnz",
+      "author": "MrCheeze",
+      "tags": ["Exits"]
+    },
+    {
+      "id": "dc-pillar",
+      "title": "DC pillar",
+      "url": "https://pastebin.com/nzt1fwCe",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "oot-rsp-segment-value-progression-during-a-frame",
+      "title": "OoT RSP Segment value progression during a frame",
+      "url": "https://pastebin.com/miRWQDTr",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "gim-thing4",
+      "title": "GIM Thing4",
+      "url": "https://pastebin.com/iDL3NJnu",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "gim-thing2",
+      "title": "GIM Thing2",
+      "url": "https://pastebin.com/TC2zRfkw",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "gi-pointers",
+      "title": "GI pointers",
+      "url": "https://pastebin.com/E0bc19ZM",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "good-candidates-for-oot-gim-cool-shenanigans",
+      "title": "Good candidates for OoT GIM cool shenanigans",
+      "url": "https://pastebin.com/3dxfc239",
+      "author": "MrCheeze",
+      "tags": ["GIM"]
+    },
+    {
+      "id": "overlay-static-variables-as-array-indexes",
+      "title": "Overlay static variables as array indexes",
+      "url": "https://pastebin.com/c4qNUC3N",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "writes-indexed-by-actor-fields",
+      "title": "Writes indexed by actor fields",
+      "url": "https://pastebin.com/DUdyfaeM",
+      "author": "MrCheeze",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "all-navi-saria-triggers",
+      "title": "All Navi/Saria triggers",
+      "url": "https://pastebin.com/4NChpLHi",
+      "author": "MrCheeze",
+      "tags": ["Navi"]
+    },
+    {
+      "id": "oscreatemesgqueue-log-master-quest-mq",
+      "title": "osCreateMesgQueue log Master Quest MQ",
+      "url": "https://pastebin.com/dqSbJ3WV",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "enemy-actors-that-change-category",
+      "title": "Enemy Actors that change category",
+      "url": "https://pastebin.com/LacSXaEw",
+      "author": "MrCheeze",
+      "tags": ["Actors"]
+    },
+    {
+      "id": "lightnode-pointers-writeable-by-position",
+      "title": "Lightnode pointers writeable by position",
+      "url": "https://pastebin.com/9scjKHrc",
+      "author": "MrCheeze",
+      "tags": ["SRM"]
+    },
+    {
+      "id": "save-corruption-for-adult-link-strat",
+      "title": "Save corruption for adult link strat",
+      "url": "https://pastebin.com/Na690rX0",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "wii-vc-rom-files-reachable-with-lightnode-filenames",
+      "title": "Wii VC rom files reachable with lightnode filenames",
+      "url": "https://pastebin.com/jT2qZxei",
+      "author": "MrCheeze",
+      "tags": ["SRM"]
+    },
+    {
+      "id": "1-2-overlay-vaddrs-for-switch-srm",
+      "title": "1.2 Overlay VAddrs (for switch SRM)",
+      "url": "https://pastebin.com/ZjKu87LS",
+      "author": "MrCheeze",
+      "tags": ["SRM"]
+    },
+    {
+      "id": "100-percent-nsr-1-2-ace-payload",
+      "title": "100% NSR 1.2 ACE Payload",
+      "url": "https://pastebin.com/A6mDLp4S",
+      "author": "MrCheeze",
+      "tags": ["ACE"]
+    },
+    {
+      "id": "room-draw-configs",
+      "title": "Room draw configs",
+      "url": "https://pastebin.com/7KitdQrY",
+      "author": "MrCheeze",
+      "tags": ["Rooms"]
+    },
+    {
+      "id": "1-2-function-pointers-with-globalctx",
+      "title": "1.2 function pointers with globalctx",
+      "url": "https://pastebin.com/sMa65HjU",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "1997-exit-lists",
+      "title": "1997 exit lists",
+      "url": "https://pastebin.com/79GzBNvd",
+      "author": "MrCheeze",
+      "tags": ["Exits"]
+    },
+    {
+      "id": "jump-table-usage-grouped-by-stack",
+      "title": "jump table usage grouped by stack",
+      "url": "https://pastebin.com/d390LsFY",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "at-usage-grouped-by-stack-usage",
+      "title": "$at usage grouped by stack usage",
+      "url": "https://pastebin.com/reGS5UMc",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "actors-with-potentially-manipulable-wrong-warp-destinations",
+      "title": "Actors with potentially manipulable wrong warp destinations",
+      "url": "https://pastebin.com/yaehwffN",
+      "author": "MrCheeze",
+      "tags": ["Actors", "WW"]
+    },
+    {
+      "id": "favored-camera-angles",
+      "title": "Favored camera angles",
+      "url": "https://pastebin.com/wqbFXQTq",
+      "author": "MrCheeze",
+      "tags": ["Camera"]
+    },
+    {
+      "id": "any-percent-filename-first-instructions",
+      "title": "Any% filename first instructions",
+      "url": "https://pastebin.com/Ldy0w9CK",
+      "author": "MrCheeze",
+      "tags": []
+    },
+    {
+      "id": "credits-warp-extended-description",
+      "title": "Credits Warp - Extended Description",
+      "url": "https://pastebin.com/tc6x2Uhi",
+      "author": "MrCheeze",
+      "tags": ["WW"]
+    },
+    {
+      "id": "easy-and-fast-total-control-full-video-description",
+      "title": "Easy and Fast Total Control - Full Video Description",
+      "url": "https://pastebin.com/29hHtupt",
+      "author": "MrCheeze",
+      "tags": ["ACE"]
     }
   ]
 }
