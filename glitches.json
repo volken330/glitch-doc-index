@@ -6,10 +6,11 @@
       "id": "megaflip",
       "title": "Megaflip",
       "url": "https://gist.github.com/USERNAME/GIST_ID",
+      "author": "SomeUser",
       "tags": ["movement", "damage-boost", "speedrun"],
       "added_at": "2026-02-21T00:00:00Z",
       "added_by": "discord:123456789012345678",
-      "notes": "Short summary of what the link contains."
+      "notes": "Root-cause walkthrough with call order + key variables."
     }
   ]
 }
