@@ -86,6 +86,15 @@
       .replaceAll("'","&#39;");
   }
 
+    // Case-insensitive compare with decent locale handling
+  const collator = new Intl.Collator(undefined, { sensitivity: "base" });
+  
+  // Return true if the first non-space character is 0-9
+  function startsWithDigit(s) {
+    const t = String(s || "").trim();
+    return t.length > 0 && t[0] >= "0" && t[0] <= "9";
+  }
+
   function toDateMs(iso) {
     const t = Date.parse(iso || "");
     return Number.isFinite(t) ? t : 0;
@@ -112,21 +121,45 @@
     }
   }
 
-  function sortItems(items) {
-    const mode = els.sort.value;
-    const copy = [...items];
+function sortItems(items) {
+  const mode = els.sort.value;
+  const copy = [...items];
 
-    if (mode === "title_asc") {
-      copy.sort((a,b)=>String(a.title||"").localeCompare(String(b.title||"")));
-    } else if (mode === "title_desc") {
-      copy.sort((a,b)=>String(b.title||"").localeCompare(String(a.title||"")));
-    } else if (mode === "newest") {
-      copy.sort((a,b)=>toDateMs(b.added_at) - toDateMs(a.added_at));
-    } else if (mode === "oldest") {
-      copy.sort((a,b)=>toDateMs(a.added_at) - toDateMs(b.added_at));
-    }
-    return copy;
+  if (mode === "title_asc") {
+    copy.sort((a, b) => {
+      const aTitle = String(a.title || "");
+      const bTitle = String(b.title || "");
+
+      const aIsNum = startsWithDigit(aTitle) ? 1 : 0;
+      const bIsNum = startsWithDigit(bTitle) ? 1 : 0;
+
+      // letters first, numbers last
+      if (aIsNum !== bIsNum) return aIsNum - bIsNum;
+
+      // within the same bucket, normal alphabetical
+      return collator.compare(aTitle, bTitle);
+    });
+  } else if (mode === "title_desc") {
+    copy.sort((a, b) => {
+      const aTitle = String(a.title || "");
+      const bTitle = String(b.title || "");
+
+      const aIsNum = startsWithDigit(aTitle) ? 1 : 0;
+      const bIsNum = startsWithDigit(bTitle) ? 1 : 0;
+
+      // keep the same bucketing rule: letters first, numbers last
+      if (aIsNum !== bIsNum) return aIsNum - bIsNum;
+
+      // reverse alphabetical within the bucket
+      return collator.compare(bTitle, aTitle);
+    });
+  } else if (mode === "newest") {
+    copy.sort((a,b)=>toDateMs(b.added_at) - toDateMs(a.added_at));
+  } else if (mode === "oldest") {
+    copy.sort((a,b)=>toDateMs(a.added_at) - toDateMs(b.added_at));
   }
+  return copy;
+}
 
   function applyFilters() {
     const q = els.q.value.trim().toLowerCase();
