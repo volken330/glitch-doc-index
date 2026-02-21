@@ -24,27 +24,52 @@
   </style>
 </head>
 
-<section style="margin-top: 22px;">
-  <h2>Submit an entry</h2>
-  <div class="row" style="align-items:flex-start;">
-    <div style="flex:1; min-width:260px;">
-      <input id="s_user" placeholder="Username (optional)" />
-      <input id="s_link" placeholder="Link (required, https://...)" />
-      <input id="s_title" placeholder="Title (required)" />
-      <input id="s_tags" placeholder="Tags (comma separated)" />
-      <textarea id="s_notes" rows="4" placeholder="Notes"></textarea>
-      <button id="s_submit">Submit</button>
-      <div id="s_msg" class="muted" style="margin-top:8px;"></div>
-    </div>
-  </div>
-</section>
-  
 <body>
   <h1>Glitch Docs Index</h1>
 <div class="muted" style="max-width: 900px; line-height: 1.35; margin-bottom: 6px;">
   <div>Notes and explanations about the technical details of glitches / OoT mechanics</div>
   <div id="subtitle"></div>
 </div>
+
+  
+<section style="margin-top: 22px; max-width: 900px;">
+  <h2 style="margin: 0 0 10px;">Submit an entry</h2>
+  <div class="muted" style="margin-bottom: 12px; line-height: 1.35;">
+    Anyone can submit. Please keep titles descriptive and links direct.
+  </div>
+
+  <form id="submitForm" style="display: grid; gap: 10px;">
+    <label style="display: grid; gap: 6px;">
+      <span class="muted">Username (optional)</span>
+      <input id="s_user" autocomplete="nickname" placeholder="e.g., coolglitchfinder" />
+    </label>
+
+    <label style="display: grid; gap: 6px;">
+      <span class="muted">Link (required)</span>
+      <input id="s_link" type="url" inputmode="url" autocomplete="url" placeholder="https://…" required />
+    </label>
+
+    <label style="display: grid; gap: 6px;">
+      <span class="muted">Title (required)</span>
+      <input id="s_title" autocomplete="off" placeholder="e.g., SRM setup via …" required />
+    </label>
+
+    <label style="display: grid; gap: 6px;">
+      <span class="muted">Tags (comma separated)</span>
+      <input id="s_tags" autocomplete="off" placeholder="rba, srm, wrong warp" />
+    </label>
+
+    <label style="display: grid; gap: 6px;">
+      <span class="muted">Notes</span>
+      <textarea id="s_notes" rows="5" placeholder="Steps, caveats, versions, etc."></textarea>
+    </label>
+
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
+      <button id="s_submit" type="button">Submit</button>
+      <div id="s_msg" class="muted" aria-live="polite"></div>
+    </div>
+  </form>
+</section>
 
   <div class="row">
     <input id="q" type="search" placeholder="Search title, author, tags, notes…" autocomplete="off" />
