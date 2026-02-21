@@ -383,14 +383,30 @@ function sortItems(items) {
   }
 
   async function updateEntry(id, updates) {
-    const { error } = await db.from("glitches").update(updates).eq("id", id);
+    const { data, error } = await db
+      .from("glitches")
+      .update(updates)
+      .eq("id", id)
+      .select("id")
+      .maybeSingle();
     if (error) {
       console.error(error);
+      els.status.innerHTML =
+        `<div class="error"><strong>Save failed:</strong> ${escapeHtml(error.message || String(error))}</div>`;
+      setTimeout(() => { if (els.status.innerHTML.includes("Save failed:")) els.status.innerHTML = ""; }, 5000);
+      renderTable();
+      return;
+    }
+    if (!data) {
+      els.status.innerHTML =
+        `<div class="error"><strong>Save failed:</strong> No row was updated. Check Supabase RLS update policy for this table.</div>`;
+      setTimeout(() => { if (els.status.innerHTML.includes("Save failed:")) els.status.innerHTML = ""; }, 7000);
       renderTable();
       return;
     }
     const item = state.raw.find((r) => String(r.id) === String(id));
     if (item) Object.assign(item, updates);
+    els.status.innerHTML = "";
     renderTable();
   }
 
