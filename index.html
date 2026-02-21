@@ -29,7 +29,7 @@
   <div class="muted" id="subtitle">Loading…</div>
 
   <div class="row">
-    <input id="q" type="search" placeholder="Search title, tags, notes…" autocomplete="off" />
+    <input id="q" type="search" placeholder="Search title, author, tags, notes…" autocomplete="off" />
     <select id="tagFilter">
       <option value="">All tags</option>
     </select>
@@ -48,10 +48,11 @@
   <table aria-label="glitch index">
     <thead>
       <tr>
-        <th style="width: 24%">Glitch</th>
+        <th style="width: 20%">Glitch</th>
+        <th style="width: 14%">Author</th>
         <th>Notes</th>
-        <th style="width: 22%">Tags</th>
-        <th style="width: 16%">Added</th>
+        <th style="width: 20%">Tags</th>
+        <th style="width: 14%">Added</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -133,6 +134,7 @@
 
     const filtered = state.raw.filter(item => {
       const title = String(item.title || "");
+      const author = String(item.author || "");
       const url = String(item.url || "");
       const notes = String(item.notes || "");
       const tags = normalizeArray(item.tags);
@@ -142,9 +144,10 @@
       if (!q) return true;
       const haystack = [
         title,
+        author,
         notes,
         tags.join(" "),
-        url // keep URL searchable even though it's not a column
+        url
       ].join(" ").toLowerCase();
 
       return haystack.includes(q);
@@ -161,6 +164,7 @@
       const title = escapeHtml(item.title || "(untitled)");
       const url = String(item.url || "");
       const safeUrl = escapeHtml(url);
+      const author = escapeHtml(item.author || "");
       const tagsHtml = pillList(item.tags);
       const added = escapeHtml(item.added_at || "");
       const notes = escapeHtml(item.notes || "");
@@ -172,6 +176,7 @@
       return `
         <tr>
           <td>${titleCell}</td>
+          <td>${author || '<span class="muted">—</span>'}</td>
           <td>${notes || '<span class="muted">—</span>'}</td>
           <td>${tagsHtml || '<span class="muted">—</span>'}</td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
@@ -179,7 +184,7 @@
       `;
     }).join("");
 
-    els.tbody.innerHTML = rows || `<tr><td colspan="4" class="muted">No results.</td></tr>`;
+    els.tbody.innerHTML = rows || `<tr><td colspan="5" class="muted">No results.</td></tr>`;
     els.count.textContent = `${state.filtered.length} / ${state.raw.length}`;
   }
 
