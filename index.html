@@ -15,9 +15,11 @@
     button { padding: 10px 12px; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(127,127,127,0.25); vertical-align: top; }
-    td.editable { cursor: pointer; }
-    td.editable:hover { background: rgba(127,127,127,0.1); }
+    td.editable { display: flex; align-items: flex-start; gap: 6px; }
+    td.editable .cell-content { flex: 1; min-width: 0; }
     td.editable input, td.editable textarea { width: 100%; padding: 6px 8px; font: inherit; box-sizing: border-box; }
+    .edit-btn { padding: 2px 6px; font-size: 12px; opacity: 0.6; cursor: pointer; border: none; background: transparent; flex-shrink: 0; }
+    .edit-btn:hover { opacity: 1; }
     th { position: sticky; top: 0; background: canvas; }
     .pill { display: inline-block; padding: 2px 8px; border: 1px solid rgba(127,127,127,0.5); border-radius: 999px; margin: 0 6px 6px 0; font-size: 12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
@@ -257,12 +259,15 @@ function sortItems(items) {
         ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><strong>${title}</strong></a>`
         : `<strong>${title}</strong> <span class="muted">(no url)</span>`;
 
+      const editBtn = (field, label) =>
+        `<button type="button" class="edit-btn" data-field="${field}" aria-label="Edit ${label}">✎</button>`;
+
       return `
         <tr data-id="${escapeHtml(id)}">
-          <td class="editable" data-field="title">${titleCell}</td>
-          <td class="editable" data-field="author">${author || '<span class="muted">—</span>'}</td>
-          <td class="editable" data-field="notes">${notes || '<span class="muted">—</span>'}</td>
-          <td class="editable" data-field="tags">${tagsHtml || '<span class="muted">—</span>'}</td>
+          <td class="editable" data-field="title"><span class="cell-content">${titleCell}</span>${editBtn("title", "title")}</td>
+          <td class="editable" data-field="author"><span class="cell-content">${author || '<span class="muted">—</span>'}</span>${editBtn("author", "author")}</td>
+          <td class="editable" data-field="notes"><span class="cell-content">${notes || '<span class="muted">—</span>'}</span>${editBtn("notes", "notes")}</td>
+          <td class="editable" data-field="tags"><span class="cell-content">${tagsHtml || '<span class="muted">—</span>'}</span>${editBtn("tags", "tags")}</td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
         </tr>
       `;
@@ -323,11 +328,11 @@ function sortItems(items) {
   }
 
   els.tbody.addEventListener("click", (e) => {
-    const cell = e.target.closest("td.editable");
-    if (!cell) return;
-    if (cell.querySelector("input, textarea")) return; // already editing
-    if (e.metaKey || e.ctrlKey) return; // allow Cmd/Ctrl+click to open link
+    const btn = e.target.closest("button.edit-btn");
+    if (!btn) return;
     e.preventDefault();
+    const cell = btn.closest("td.editable");
+    if (!cell || cell.querySelector("input, textarea")) return;
     const row = cell.closest("tr");
     const itemId = row?.dataset?.id;
     if (!itemId) return;
