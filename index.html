@@ -29,12 +29,9 @@
   <div class="muted" id="subtitle">Loading…</div>
 
   <div class="row">
-    <input id="q" type="search" placeholder="Search title, tags, code area, notes…" autocomplete="off" />
+    <input id="q" type="search" placeholder="Search title, tags, notes…" autocomplete="off" />
     <select id="tagFilter">
       <option value="">All tags</option>
-    </select>
-    <select id="areaFilter">
-      <option value="">All code areas</option>
     </select>
     <select id="sort">
       <option value="title_asc">Sort: Title (A→Z)</option>
@@ -51,12 +48,10 @@
   <table aria-label="glitch index">
     <thead>
       <tr>
-        <th style="width: 22%">Glitch</th>
+        <th style="width: 24%">Glitch</th>
         <th>Link</th>
-        <th style="width: 18%">Tags</th>
-        <th style="width: 18%">Code area</th>
-        <th style="width: 14%">Validated commit</th>
-        <th style="width: 14%">Added</th>
+        <th style="width: 22%">Tags</th>
+        <th style="width: 16%">Added</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -67,7 +62,6 @@
     raw: [],
     filtered: [],
     tags: new Set(),
-    areas: new Set(),
     meta: { version: 0, updated_at: "" }
   };
 
@@ -77,7 +71,6 @@
     tbody: document.getElementById("tbody"),
     q: document.getElementById("q"),
     tagFilter: document.getElementById("tagFilter"),
-    areaFilter: document.getElementById("areaFilter"),
     sort: document.getElementById("sort"),
     reset: document.getElementById("reset"),
     count: document.getElementById("count")
@@ -88,7 +81,7 @@
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
+      .replaceAll('"',"quot;")
       .replaceAll("'","&#39;");
   }
 
@@ -109,53 +102,13 @@
   }
 
   function buildFilters() {
-    // populate tag and area dropdowns
     const tagOptions = [...state.tags].sort((a,b)=>a.localeCompare(b));
-    const areaOptions = [...state.areas].sort((a,b)=>a.localeCompare(b));
-
     for (const t of tagOptions) {
       const opt = document.createElement("option");
       opt.value = t;
       opt.textContent = t;
       els.tagFilter.appendChild(opt);
     }
-
-    for (const a of areaOptions) {
-      const opt = document.createElement("option");
-      opt.value = a;
-      opt.textContent = a;
-      els.areaFilter.appendChild(opt);
-    }
-  }
-
-  function applyFilters() {
-    const q = els.q.value.trim().toLowerCase();
-    const tag = els.tagFilter.value;
-    const area = els.areaFilter.value;
-
-    const filtered = state.raw.filter(item => {
-      const title = String(item.title || "");
-      const url = String(item.url || "");
-      const notes = String(item.notes || "");
-      const tags = normalizeArray(item.tags);
-      const areas = normalizeArray(item.code_area);
-
-      if (tag && !tags.includes(tag)) return false;
-      if (area && !areas.includes(area)) return false;
-
-      if (!q) return true;
-      const haystack = [
-        title, url, notes,
-        tags.join(" "),
-        areas.join(" "),
-        String(item.validated_commit || "")
-      ].join(" ").toLowerCase();
-
-      return haystack.includes(q);
-    });
-
-    state.filtered = sortItems(filtered);
-    renderTable();
   }
 
   function sortItems(items) {
@@ -174,6 +127,31 @@
     return copy;
   }
 
+  function applyFilters() {
+    const q = els.q.value.trim().toLowerCase();
+    const tag = els.tagFilter.value;
+
+    const filtered = state.raw.filter(item => {
+      const title = String(item.title || "");
+      const url = String(item.url || "");
+      const notes = String(item.notes || "");
+      const tags = normalizeArray(item.tags);
+
+      if (tag && !tags.includes(tag)) return false;
+
+      if (!q) return true;
+      const haystack = [
+        title, url, notes,
+        tags.join(" ")
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(q);
+    });
+
+    state.filtered = sortItems(filtered);
+    renderTable();
+  }
+
   function renderTable() {
     els.tbody.innerHTML = "";
     const rows = state.filtered.map(item => {
@@ -181,8 +159,6 @@
       const url = String(item.url || "");
       const safeUrl = escapeHtml(url);
       const tagsHtml = pillList(item.tags);
-      const areasHtml = pillList(item.code_area);
-      const commit = escapeHtml(item.validated_commit || "");
       const added = escapeHtml(item.added_at || "");
       const notes = escapeHtml(item.notes || "");
 
@@ -195,14 +171,12 @@
           <td><strong>${title}</strong><div class="muted mono">${escapeHtml(item.id || "")}</div></td>
           <td>${linkCell}</td>
           <td>${tagsHtml || '<span class="muted">—</span>'}</td>
-          <td>${areasHtml || '<span class="muted">—</span>'}</td>
-          <td class="mono">${commit || '<span class="muted">—</span>'}</td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
         </tr>
       `;
     }).join("");
 
-    els.tbody.innerHTML = rows || `<tr><td colspan="6" class="muted">No results.</td></tr>`;
+    els.tbody.innerHTML = rows || `<tr><td colspan="4" class="muted">No results.</td></tr>`;
     els.count.textContent = `${state.filtered.length} / ${state.raw.length}`;
   }
 
@@ -219,34 +193,28 @@
       const list = Array.isArray(data.glitches) ? data.glitches : [];
       state.raw = list;
 
-      // collect tags/areas
       state.tags = new Set();
-      state.areas = new Set();
       for (const item of list) {
         for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
-        for (const a of normalizeArray(item.code_area)) if (a) state.areas.add(String(a));
       }
 
       els.subtitle.textContent = `Index v${state.meta.version}${state.meta.updated_at ? ` • updated ${state.meta.updated_at}` : ""}`;
       buildFilters();
 
-      state.filtered = sortItems(state.raw);
-      renderTable();
-
       // wire UI
       els.q.addEventListener("input", applyFilters);
       els.tagFilter.addEventListener("change", applyFilters);
-      els.areaFilter.addEventListener("change", applyFilters);
       els.sort.addEventListener("change", applyFilters);
       els.reset.addEventListener("click", () => {
         els.q.value = "";
         els.tagFilter.value = "";
-        els.areaFilter.value = "";
         els.sort.value = "title_asc";
         applyFilters();
       });
 
-      // initial filter
+      // initial
+      state.filtered = sortItems(state.raw);
+      renderTable();
       applyFilters();
     } catch (err) {
       els.subtitle.textContent = "Failed to load index.";
