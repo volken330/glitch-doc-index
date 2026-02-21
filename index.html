@@ -24,6 +24,21 @@
   </style>
 </head>
 
+<section style="margin-top: 22px;">
+  <h2>Submit an entry</h2>
+  <div class="row" style="align-items:flex-start;">
+    <div style="flex:1; min-width:260px;">
+      <input id="s_user" placeholder="Username (optional)" />
+      <input id="s_link" placeholder="Link (required, https://...)" />
+      <input id="s_title" placeholder="Title (required)" />
+      <input id="s_tags" placeholder="Tags (comma separated)" />
+      <textarea id="s_notes" rows="4" placeholder="Notes"></textarea>
+      <button id="s_submit">Submit</button>
+      <div id="s_msg" class="muted" style="margin-top:8px;"></div>
+    </div>
+  </div>
+</section>
+  
 <body>
   <h1>Glitch Docs Index</h1>
 <div class="muted" style="max-width: 900px; line-height: 1.35; margin-bottom: 6px;">
@@ -61,7 +76,17 @@
     <tbody id="tbody"></tbody>
   </table>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
 <script>
+  const { createClient } = supabase;
+  
+  // Put these from Supabase Project Settings → API
+  const SUPABASE_URL = "https://oxpfqgsjkmkgtmmrlpoh.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_pXZjZlbNjByPd2CRkq-CUQ_w7O0XQ6p";
+  
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
   const state = {
     raw: [],
     filtered: [],
@@ -70,7 +95,6 @@
   };
 
   const els = {
-    subtitle: document.getElementById("subtitle"),
     status: document.getElementById("status"),
     tbody: document.getElementById("tbody"),
     q: document.getElementById("q"),
@@ -224,53 +248,113 @@ function sortItems(items) {
     els.count.textContent = `${state.filtered.length} / ${state.raw.length}`;
   }
 
-  async function load() {
-    try {
-      els.status.innerHTML = "";
-      const res = await fetch("./glitches.json", { cache: "no-store" });
-      if (!res.ok) throw new Error(`Failed to fetch glitches.json (${res.status})`);
-      const data = await res.json();
+async function load() {
+  try {
+    els.status.innerHTML = "";
 
-      state.meta.version = data.version || 0;
-      state.meta.updated_at = data.updated_at || "";
+    const { data, error } = await db
+      .from("glitches")
+      .select("title,author,url,notes,tags,added_at")
+      .order("title", { ascending: true });
 
-      const list = Array.isArray(data.glitches) ? data.glitches : [];
-      state.raw = list;
+    if (error) throw error;
 
-      state.tags = new Set();
-      for (const item of list) {
-        for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
-      }
+    const list = Array.isArray(data) ? data : [];
+    state.raw = list;
 
-      els.subtitle.textContent =
-        `Index v${state.meta.version}${state.meta.updated_at ? ` • updated ${state.meta.updated_at}` : ""}`;
-
-      buildFilters();
-
-      // wire UI
-      els.q.addEventListener("input", applyFilters);
-      els.tagFilter.addEventListener("change", applyFilters);
-      els.sort.addEventListener("change", applyFilters);
-      els.reset.addEventListener("click", () => {
-        els.q.value = "";
-        els.tagFilter.value = "";
-        els.sort.value = "title_asc";
-        applyFilters();
-      });
-
-      // initial
-      state.filtered = sortItems(state.raw);
-      renderTable();
-      applyFilters();
-    } catch (err) {
-      els.subtitle.textContent = "Failed to load index.";
-      els.status.innerHTML =
-        `<div class="error"><strong>Error:</strong> ${escapeHtml(err.message || String(err))}</div>`;
-      console.error(err);
+    // rebuild tags
+    state.tags = new Set();
+    for (const item of list) {
+      for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
     }
+
+    // If you're using the subtitle meta line, keep this:
+    if (els.subtitle) els.subtitle.textContent = `Loaded from Supabase • ${list.length} entries`;
+
+    // rebuild tag dropdown (clear old options except "All tags")
+    els.tagFilter.querySelectorAll("option:not([value=''])").forEach(o => o.remove());
+    buildFilters();
+
+    // initial render
+    state.filtered = sortItems(state.raw);
+    renderTable();
+    applyFilters();
+  } catch (err) {
+    if (els.subtitle) els.subtitle.textContent = "Failed to load index.";
+    els.status.innerHTML =
+      `<div class="error"><strong>Error:</strong> ${escapeHtml(err.message || String(err))}</div>`;
+    console.error(err);
   }
+}
 
   load();
+
+const s = {
+  user: document.getElementById("s_user"),
+  link: document.getElementById("s_link"),
+  title: document.getElementById("s_title"),
+  tags: document.getElementById("s_tags"),
+  notes: document.getElementById("s_notes"),
+  submit: document.getElementById("s_submit"),
+  msg: document.getElementById("s_msg"),
+};
+
+function parseTagsCsv(s) {
+  return String(s || "")
+    .split(",")
+    .map(t => t.trim())
+    .filter(Boolean)
+    .slice(0, 25); // tiny sanity limit
+}
+
+async function submitEntry() {
+  s.msg.textContent = "";
+
+  const author = s.user.value.trim();
+  const url = s.link.value.trim();
+  const title = s.title.value.trim();
+  const notes = s.notes.value.trim();
+  const tags = parseTagsCsv(s.tags.value);
+
+  if (!title) return (s.msg.textContent = "Title is required.");
+  if (!url) return (s.msg.textContent = "Link is required.");
+  try { new URL(url); } catch { return (s.msg.textContent = "Link must be a valid URL (include https://)."); }
+
+  s.submit.disabled = true;
+  s.msg.textContent = "Submitting…";
+
+  const { error } = await db.from("glitches").insert([{
+    title,
+    author: author || null,
+    url,
+    notes: notes || null,
+    tags,
+    // added_at will default on the DB, but you can also send:
+    // added_at: new Date().toISOString().slice(0,10),
+  }]);
+
+  s.submit.disabled = false;
+
+  if (error) {
+    console.error(error);
+    s.msg.textContent = `Submit failed: ${error.message}`;
+    return;
+  }
+
+  s.msg.textContent = "Submitted! Refreshing…";
+
+  // Clear inputs
+  s.link.value = "";
+  s.title.value = "";
+  s.notes.value = "";
+  s.tags.value = "";
+
+  // Reload from DB so it appears immediately
+  await load();
+}
+
+s.submit.addEventListener("click", submitEntry);
+  
 </script>
 </body>
 </html>
