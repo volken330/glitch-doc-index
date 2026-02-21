@@ -374,6 +374,18 @@ async function submitEntry() {
 }
 
 s.submit.addEventListener("click", submitEntry);
+
+// Keep table in sync with UI controls
+els.q.addEventListener("input", applyFilters);
+els.tagFilter.addEventListener("change", applyFilters);
+els.sort.addEventListener("change", applyFilters);
+
+els.reset.addEventListener("click", () => {
+  els.q.value = "";
+  els.tagFilter.value = "";
+  els.sort.value = "title_asc";
+  applyFilters();
+});
   
 </script>
 </body>
