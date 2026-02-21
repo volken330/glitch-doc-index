@@ -24,6 +24,9 @@
     .edit-btn { padding: 2px 6px; font-size: 12px; opacity: 0.6; cursor: pointer; border: none; background: transparent; flex-shrink: 0; }
     .edit-btn:hover { opacity: 1; }
     th { position: sticky; top: 0; background: canvas; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { opacity: 0.9; }
+    .sort-indicator { opacity: 0.7; margin-left: 2px; }
     .pill { display: inline-block; padding: 2px 8px; border: 1px solid rgba(127,127,127,0.5); border-radius: 999px; margin: 0 6px 6px 0; font-size: 12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
     .count { margin-left: auto; }
@@ -81,10 +84,6 @@
     <select id="tagFilter" style="display:none">
   <option value="">All tags</option>
 </select>
-    <select id="sort">
-      <option value="title_asc" selected>Sort: Title (A→Z)</option>
-      <option value="title_desc">Sort: Title (Z→A)</option>
-    </select>
     <button id="reset">Reset</button>
     <div class="count muted" id="count"></div>
   </div>
@@ -94,11 +93,11 @@
   <table aria-label="glitch index">
     <thead>
       <tr>
-        <th style="width: 20%">Title</th>
-        <th style="width: 14%">Author</th>
-        <th>Notes</th>
-        <th style="width: 20%">Tags</th>
-        <th style="width: 14%">Added</th>
+        <th class="sortable" data-sort="title" style="width: 20%">Title <span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="author" style="width: 14%">Author <span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="notes">Notes <span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="tags" style="width: 20%">Tags <span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="added_at" style="width: 14%">Added <span class="sort-indicator"></span></th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -119,15 +118,17 @@
     raw: [],
     filtered: [],
     tags: new Set(),
-    meta: { version: 0, updated_at: "" }
+    meta: { version: 0, updated_at: "" },
+    sortColumn: "title",
+    sortAsc: true
   };
 
   const els = {
     status: document.getElementById("status"),
     tbody: document.getElementById("tbody"),
+    thead: document.querySelector("table thead"),
     q: document.getElementById("q"),
     tagFilter: document.getElementById("tagFilter"),
-    sort: document.getElementById("sort"),
     reset: document.getElementById("reset"),
     count: document.getElementById("count")
   };
@@ -176,45 +177,50 @@
     }
   }
 
-function sortItems(items) {
-  const mode = els.sort.value;
-  const copy = [...items];
+  function sortItems(items) {
+    const col = state.sortColumn;
+    const asc = state.sortAsc;
+    const copy = [...items];
+    const mult = asc ? 1 : -1;
 
-  if (mode === "title_asc") {
-    copy.sort((a, b) => {
-      const aTitle = String(a.title || "");
-      const bTitle = String(b.title || "");
-
-      const aIsNum = startsWithDigit(aTitle) ? 1 : 0;
-      const bIsNum = startsWithDigit(bTitle) ? 1 : 0;
-
-      // letters first, numbers last
-      if (aIsNum !== bIsNum) return aIsNum - bIsNum;
-
-      // within the same bucket, normal alphabetical
-      return collator.compare(aTitle, bTitle);
-    });
-  } else if (mode === "title_desc") {
-    copy.sort((a, b) => {
-      const aTitle = String(a.title || "");
-      const bTitle = String(b.title || "");
-
-      const aIsNum = startsWithDigit(aTitle) ? 1 : 0;
-      const bIsNum = startsWithDigit(bTitle) ? 1 : 0;
-
-      // keep the same bucketing rule: letters first, numbers last
-      if (aIsNum !== bIsNum) return aIsNum - bIsNum;
-
-      // reverse alphabetical within the bucket
-      return collator.compare(bTitle, aTitle);
-    });
-  } else if (mode === "newest") {
-    copy.sort((a,b)=>toDateMs(b.added_at) - toDateMs(a.added_at));
-  } else if (mode === "oldest") {
-    copy.sort((a,b)=>toDateMs(a.added_at) - toDateMs(b.added_at));
+    if (col === "title") {
+      copy.sort((a, b) => {
+        const aTitle = String(a.title || "");
+        const bTitle = String(b.title || "");
+        const aIsNum = startsWithDigit(aTitle) ? 1 : 0;
+        const bIsNum = startsWithDigit(bTitle) ? 1 : 0;
+        if (aIsNum !== bIsNum) return mult * (aIsNum - bIsNum);
+        return mult * collator.compare(aTitle, bTitle);
+      });
+    } else if (col === "author") {
+      copy.sort((a, b) => mult * collator.compare(String(a.author || ""), String(b.author || "")));
+    } else if (col === "notes") {
+      copy.sort((a, b) => mult * collator.compare(String(a.notes || ""), String(b.notes || "")));
+    } else if (col === "tags") {
+      copy.sort((a, b) => {
+        const aTags = normalizeArray(a.tags).join(" ");
+        const bTags = normalizeArray(b.tags).join(" ");
+        return mult * collator.compare(aTags, bTags);
+      });
+    } else if (col === "added_at") {
+      copy.sort((a, b) => mult * (toDateMs(a.added_at) - toDateMs(b.added_at)));
+    }
+    return copy;
   }
-  return copy;
-}
+
+  function updateSortHeaders() {
+    if (!els.thead) return;
+    els.thead.querySelectorAll("th.sortable").forEach((th) => {
+      const col = th.dataset.sort;
+      const ind = th.querySelector(".sort-indicator");
+      if (!ind) return;
+      if (col === state.sortColumn) {
+        ind.textContent = state.sortAsc ? " ↑" : " ↓";
+      } else {
+        ind.textContent = "";
+      }
+    });
+  }
 
   function applyFilters() {
     const q = els.q.value.trim().toLowerCase();
@@ -242,6 +248,7 @@ function sortItems(items) {
     });
 
     state.filtered = sortItems(filtered);
+    updateSortHeaders();
     renderTable();
   }
 
@@ -552,12 +559,21 @@ s.submit.addEventListener("click", submitEntry);
 // Keep table in sync with UI controls
 els.q.addEventListener("input", applyFilters);
 els.tagFilter.addEventListener("change", applyFilters);
-els.sort.addEventListener("change", applyFilters);
+
+els.thead?.addEventListener("click", (e) => {
+  const th = e.target.closest("th.sortable");
+  if (!th?.dataset.sort) return;
+  const col = th.dataset.sort;
+  if (state.sortColumn === col) state.sortAsc = !state.sortAsc;
+  else { state.sortColumn = col; state.sortAsc = true; }
+  applyFilters();
+});
 
 els.reset.addEventListener("click", () => {
   els.q.value = "";
   els.tagFilter.value = "";
-  els.sort.value = "title_asc";
+  state.sortColumn = "title";
+  state.sortAsc = true;
   applyFilters();
 });
   
