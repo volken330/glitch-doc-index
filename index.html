@@ -41,17 +41,17 @@
   <form id="submitForm" style="display: grid; gap: 10px;">
     <label style="display: grid; gap: 6px;">
       <span class="muted">Username (optional)</span>
-      <input id="s_user" autocomplete="nickname" placeholder="e.g., coolglitchfinder" />
+      <input id="s_user" autocomplete="nickname" placeholder="e.g., myusername" />
     </label>
 
     <label style="display: grid; gap: 6px;">
-      <span class="muted">Link (required)</span>
+      <span class="muted">Link to doc (required)</span>
       <input id="s_link" type="url" inputmode="url" autocomplete="url" placeholder="https://…" required />
     </label>
 
     <label style="display: grid; gap: 6px;">
       <span class="muted">Title (required)</span>
-      <input id="s_title" autocomplete="off" placeholder="e.g., SRM setup via …" required />
+      <input id="s_title" autocomplete="off" placeholder="e.g., Wrong warp explanation..." required />
     </label>
 
     <label style="display: grid; gap: 6px;">
@@ -61,7 +61,7 @@
 
     <label style="display: grid; gap: 6px;">
       <span class="muted">Notes</span>
-      <textarea id="s_notes" rows="5" placeholder="Steps, caveats, versions, etc."></textarea>
+      <textarea id="s_notes" rows="5" placeholder="Caveats, descriptions, etc."></textarea>
     </label>
 
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
@@ -293,7 +293,6 @@ async function load() {
       for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
     }
 
-    // If you're using the subtitle meta line, keep this:
     if (els.subtitle) els.subtitle.textContent = `Loaded from Supabase • ${list.length} entries`;
 
     // rebuild tag dropdown (clear old options except "All tags")
