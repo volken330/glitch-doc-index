@@ -15,6 +15,9 @@
     button { padding: 10px 12px; cursor: pointer; }
     table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(127,127,127,0.25); vertical-align: top; }
+    td.editable { cursor: pointer; }
+    td.editable:hover { background: rgba(127,127,127,0.1); }
+    td.editable input, td.editable textarea { width: 100%; padding: 6px 8px; font: inherit; box-sizing: border-box; }
     th { position: sticky; top: 0; background: canvas; }
     .pill { display: inline-block; padding: 2px 8px; border: 1px solid rgba(127,127,127,0.5); border-radius: 999px; margin: 0 6px 6px 0; font-size: 12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
@@ -248,17 +251,18 @@ function sortItems(items) {
       const tagsHtml = pillList(item.tags);
       const added = escapeHtml(item.added_at || "");
       const notes = escapeHtml(item.notes || "");
+      const id = item.id || "";
 
       const titleCell = url
         ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><strong>${title}</strong></a>`
         : `<strong>${title}</strong> <span class="muted">(no url)</span>`;
 
       return `
-        <tr>
-          <td>${titleCell}</td>
-          <td>${author || '<span class="muted">—</span>'}</td>
-          <td>${notes || '<span class="muted">—</span>'}</td>
-          <td>${tagsHtml || '<span class="muted">—</span>'}</td>
+        <tr data-id="${escapeHtml(id)}">
+          <td class="editable" data-field="title">${titleCell}</td>
+          <td class="editable" data-field="author">${author || '<span class="muted">—</span>'}</td>
+          <td class="editable" data-field="notes">${notes || '<span class="muted">—</span>'}</td>
+          <td class="editable" data-field="tags">${tagsHtml || '<span class="muted">—</span>'}</td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
         </tr>
       `;
@@ -268,13 +272,80 @@ function sortItems(items) {
     els.count.textContent = `${state.filtered.length} / ${state.raw.length}`;
   }
 
+  function startEdit(cell, itemId, field, currentValue) {
+    const isTags = field === "tags";
+    const current = isTags
+      ? normalizeArray(currentValue).join(", ")
+      : String(currentValue || "");
+    const el = document.createElement(isTags ? "input" : "textarea");
+    el.type = isTags ? "text" : null;
+    el.value = current;
+    el.style.minHeight = isTags ? "" : "60px";
+    el.style.resize = "vertical";
+    cell.innerHTML = "";
+    cell.appendChild(el);
+    el.focus();
+    el.select?.();
+
+    function finishEdit() {
+      const newVal = el.value.trim();
+      const oldVal = isTags ? normalizeArray(currentValue).join(", ") : String(currentValue || "");
+      if (newVal !== oldVal) {
+        updateEntry(itemId, field, isTags ? parseTagsCsv(newVal) : newVal);
+      } else {
+        renderTable();
+      }
+    }
+
+    el.addEventListener("blur", finishEdit);
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !isTags) {
+        e.preventDefault();
+        el.blur();
+      } else if (e.key === "Escape") {
+        el.value = current;
+        el.blur();
+      }
+    });
+  }
+
+  async function updateEntry(id, field, value) {
+    const payload = { [field]: value };
+    const { error } = await db.from("glitches").update(payload).eq("id", id);
+    if (error) {
+      console.error(error);
+      renderTable();
+      return;
+    }
+    const item = state.raw.find((r) => String(r.id) === String(id));
+    if (item) item[field] = value;
+    renderTable();
+  }
+
+  els.tbody.addEventListener("click", (e) => {
+    const cell = e.target.closest("td.editable");
+    if (!cell) return;
+    if (cell.querySelector("input, textarea")) return; // already editing
+    if (e.metaKey || e.ctrlKey) return; // allow Cmd/Ctrl+click to open link
+    e.preventDefault();
+    const row = cell.closest("tr");
+    const itemId = row?.dataset?.id;
+    if (!itemId) return;
+    const field = cell.dataset?.field;
+    if (!field) return;
+    const item = state.raw.find((r) => String(r.id) === itemId) || state.filtered.find((r) => String(r.id) === itemId);
+    if (!item) return;
+    const currentValue = item[field];
+    startEdit(cell, itemId, field, currentValue);
+  });
+
 async function load() {
   try {
     els.status.innerHTML = "";
 
     const { data, error } = await db
       .from("glitches")
-      .select("title,author,url,notes,tags,added_at")
+      .select("id,title,author,url,notes,tags,added_at")
       .order("title", { ascending: true });
 
     if (error) throw error;
