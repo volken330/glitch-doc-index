@@ -49,7 +49,7 @@
     <thead>
       <tr>
         <th style="width: 24%">Glitch</th>
-        <th>Link</th>
+        <th>Notes</th>
         <th style="width: 22%">Tags</th>
         <th style="width: 16%">Added</th>
       </tr>
@@ -81,7 +81,7 @@
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
       .replaceAll(">","&gt;")
-      .replaceAll('"',"quot;")
+      .replaceAll('"',"&quot;")
       .replaceAll("'","&#39;");
   }
 
@@ -141,8 +141,10 @@
 
       if (!q) return true;
       const haystack = [
-        title, url, notes,
-        tags.join(" ")
+        title,
+        notes,
+        tags.join(" "),
+        url // keep URL searchable even though it's not a column
       ].join(" ").toLowerCase();
 
       return haystack.includes(q);
@@ -154,6 +156,7 @@
 
   function renderTable() {
     els.tbody.innerHTML = "";
+
     const rows = state.filtered.map(item => {
       const title = escapeHtml(item.title || "(untitled)");
       const url = String(item.url || "");
@@ -162,14 +165,14 @@
       const added = escapeHtml(item.added_at || "");
       const notes = escapeHtml(item.notes || "");
 
-      const linkCell = url
-        ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>${notes ? `<div class="muted" style="margin-top:6px">${notes}</div>` : ""}`
-        : `<span class="muted">(no link)</span>${notes ? `<div class="muted" style="margin-top:6px">${notes}</div>` : ""}`;
+      const titleCell = url
+        ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><strong>${title}</strong></a>`
+        : `<strong>${title}</strong> <span class="muted">(no url)</span>`;
 
       return `
         <tr>
-          <td><strong>${title}</strong><div class="muted mono">${escapeHtml(item.id || "")}</div></td>
-          <td>${linkCell}</td>
+          <td>${titleCell}</td>
+          <td>${notes || '<span class="muted">—</span>'}</td>
           <td>${tagsHtml || '<span class="muted">—</span>'}</td>
           <td class="mono">${added || '<span class="muted">—</span>'}</td>
         </tr>
@@ -198,7 +201,9 @@
         for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
       }
 
-      els.subtitle.textContent = `Index v${state.meta.version}${state.meta.updated_at ? ` • updated ${state.meta.updated_at}` : ""}`;
+      els.subtitle.textContent =
+        `Index v${state.meta.version}${state.meta.updated_at ? ` • updated ${state.meta.updated_at}` : ""}`;
+
       buildFilters();
 
       // wire UI
@@ -218,7 +223,8 @@
       applyFilters();
     } catch (err) {
       els.subtitle.textContent = "Failed to load index.";
-      els.status.innerHTML = `<div class="error"><strong>Error:</strong> ${escapeHtml(err.message || String(err))}</div>`;
+      els.status.innerHTML =
+        `<div class="error"><strong>Error:</strong> ${escapeHtml(err.message || String(err))}</div>`;
       console.error(err);
     }
   }
