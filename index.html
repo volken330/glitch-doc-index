@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Glitch Docs Index</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+    h1 { margin: 0 0 8px; }
+    .muted { opacity: 0.75; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
+    input[type="search"] { padding: 10px 12px; min-width: 260px; flex: 1; }
+    select { padding: 10px 12px; }
+    button { padding: 10px 12px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(127,127,127,0.25); vertical-align: top; }
+    th { position: sticky; top: 0; background: canvas; }
+    .pill { display: inline-block; padding: 2px 8px; border: 1px solid rgba(127,127,127,0.5); border-radius: 999px; margin: 0 6px 6px 0; font-size: 12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; }
+    .count { margin-left: auto; }
+    .error { padding: 10px 12px; border: 1px solid rgba(255,0,0,0.4); border-radius: 8px; }
+    a { word-break: break-word; }
+  </style>
+</head>
+
+<body>
+  <h1>Glitch Docs Index</h1>
+  <div class="muted" id="subtitle">Loading…</div>
+
+  <div class="row">
+    <input id="q" type="search" placeholder="Search title, tags, code area, notes…" autocomplete="off" />
+    <select id="tagFilter">
+      <option value="">All tags</option>
+    </select>
+    <select id="areaFilter">
+      <option value="">All code areas</option>
+    </select>
+    <select id="sort">
+      <option value="title_asc">Sort: Title (A→Z)</option>
+      <option value="title_desc">Sort: Title (Z→A)</option>
+      <option value="newest">Sort: Newest</option>
+      <option value="oldest">Sort: Oldest</option>
+    </select>
+    <button id="reset">Reset</button>
+    <div class="count muted" id="count"></div>
+  </div>
+
+  <div id="status"></div>
+
+  <table aria-label="glitch index">
+    <thead>
+      <tr>
+        <th style="width: 22%">Glitch</th>
+        <th>Link</th>
+        <th style="width: 18%">Tags</th>
+        <th style="width: 18%">Code area</th>
+        <th style="width: 14%">Validated commit</th>
+        <th style="width: 14%">Added</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+<script>
+  const state = {
+    raw: [],
+    filtered: [],
+    tags: new Set(),
+    areas: new Set(),
+    meta: { version: 0, updated_at: "" }
+  };
+
+  const els = {
+    subtitle: document.getElementById("subtitle"),
+    status: document.getElementById("status"),
+    tbody: document.getElementById("tbody"),
+    q: document.getElementById("q"),
+    tagFilter: document.getElementById("tagFilter"),
+    areaFilter: document.getElementById("areaFilter"),
+    sort: document.getElementById("sort"),
+    reset: document.getElementById("reset"),
+    count: document.getElementById("count")
+  };
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  function toDateMs(iso) {
+    const t = Date.parse(iso || "");
+    return Number.isFinite(t) ? t : 0;
+  }
+
+  function normalizeArray(v) {
+    if (!v) return [];
+    return Array.isArray(v) ? v : [v];
+  }
+
+  function pillList(items) {
+    const arr = normalizeArray(items).filter(Boolean);
+    if (!arr.length) return "";
+    return arr.map(x => `<span class="pill">${escapeHtml(x)}</span>`).join("");
+  }
+
+  function buildFilters() {
+    // populate tag and area dropdowns
+    const tagOptions = [...state.tags].sort((a,b)=>a.localeCompare(b));
+    const areaOptions = [...state.areas].sort((a,b)=>a.localeCompare(b));
+
+    for (const t of tagOptions) {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      els.tagFilter.appendChild(opt);
+    }
+
+    for (const a of areaOptions) {
+      const opt = document.createElement("option");
+      opt.value = a;
+      opt.textContent = a;
+      els.areaFilter.appendChild(opt);
+    }
+  }
+
+  function applyFilters() {
+    const q = els.q.value.trim().toLowerCase();
+    const tag = els.tagFilter.value;
+    const area = els.areaFilter.value;
+
+    const filtered = state.raw.filter(item => {
+      const title = String(item.title || "");
+      const url = String(item.url || "");
+      const notes = String(item.notes || "");
+      const tags = normalizeArray(item.tags);
+      const areas = normalizeArray(item.code_area);
+
+      if (tag && !tags.includes(tag)) return false;
+      if (area && !areas.includes(area)) return false;
+
+      if (!q) return true;
+      const haystack = [
+        title, url, notes,
+        tags.join(" "),
+        areas.join(" "),
+        String(item.validated_commit || "")
+      ].join(" ").toLowerCase();
+
+      return haystack.includes(q);
+    });
+
+    state.filtered = sortItems(filtered);
+    renderTable();
+  }
+
+  function sortItems(items) {
+    const mode = els.sort.value;
+    const copy = [...items];
+
+    if (mode === "title_asc") {
+      copy.sort((a,b)=>String(a.title||"").localeCompare(String(b.title||"")));
+    } else if (mode === "title_desc") {
+      copy.sort((a,b)=>String(b.title||"").localeCompare(String(a.title||"")));
+    } else if (mode === "newest") {
+      copy.sort((a,b)=>toDateMs(b.added_at) - toDateMs(a.added_at));
+    } else if (mode === "oldest") {
+      copy.sort((a,b)=>toDateMs(a.added_at) - toDateMs(b.added_at));
+    }
+    return copy;
+  }
+
+  function renderTable() {
+    els.tbody.innerHTML = "";
+    const rows = state.filtered.map(item => {
+      const title = escapeHtml(item.title || "(untitled)");
+      const url = String(item.url || "");
+      const safeUrl = escapeHtml(url);
+      const tagsHtml = pillList(item.tags);
+      const areasHtml = pillList(item.code_area);
+      const commit = escapeHtml(item.validated_commit || "");
+      const added = escapeHtml(item.added_at || "");
+      const notes = escapeHtml(item.notes || "");
+
+      const linkCell = url
+        ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>${notes ? `<div class="muted" style="margin-top:6px">${notes}</div>` : ""}`
+        : `<span class="muted">(no link)</span>${notes ? `<div class="muted" style="margin-top:6px">${notes}</div>` : ""}`;
+
+      return `
+        <tr>
+          <td><strong>${title}</strong><div class="muted mono">${escapeHtml(item.id || "")}</div></td>
+          <td>${linkCell}</td>
+          <td>${tagsHtml || '<span class="muted">—</span>'}</td>
+          <td>${areasHtml || '<span class="muted">—</span>'}</td>
+          <td class="mono">${commit || '<span class="muted">—</span>'}</td>
+          <td class="mono">${added || '<span class="muted">—</span>'}</td>
+        </tr>
+      `;
+    }).join("");
+
+    els.tbody.innerHTML = rows || `<tr><td colspan="6" class="muted">No results.</td></tr>`;
+    els.count.textContent = `${state.filtered.length} / ${state.raw.length}`;
+  }
+
+  async function load() {
+    try {
+      els.status.innerHTML = "";
+      const res = await fetch("./glitches.json", { cache: "no-store" });
+      if (!res.ok) throw new Error(`Failed to fetch glitches.json (${res.status})`);
+      const data = await res.json();
+
+      state.meta.version = data.version || 0;
+      state.meta.updated_at = data.updated_at || "";
+
+      const list = Array.isArray(data.glitches) ? data.glitches : [];
+      state.raw = list;
+
+      // collect tags/areas
+      state.tags = new Set();
+      state.areas = new Set();
+      for (const item of list) {
+        for (const t of normalizeArray(item.tags)) if (t) state.tags.add(String(t));
+        for (const a of normalizeArray(item.code_area)) if (a) state.areas.add(String(a));
+      }
+
+      els.subtitle.textContent = `Index v${state.meta.version}${state.meta.updated_at ? ` • updated ${state.meta.updated_at}` : ""}`;
+      buildFilters();
+
+      state.filtered = sortItems(state.raw);
+      renderTable();
+
+      // wire UI
+      els.q.addEventListener("input", applyFilters);
+      els.tagFilter.addEventListener("change", applyFilters);
+      els.areaFilter.addEventListener("change", applyFilters);
+      els.sort.addEventListener("change", applyFilters);
+      els.reset.addEventListener("click", () => {
+        els.q.value = "";
+        els.tagFilter.value = "";
+        els.areaFilter.value = "";
+        els.sort.value = "title_asc";
+        applyFilters();
+      });
+
+      // initial filter
+      applyFilters();
+    } catch (err) {
+      els.subtitle.textContent = "Failed to load index.";
+      els.status.innerHTML = `<div class="error"><strong>Error:</strong> ${escapeHtml(err.message || String(err))}</div>`;
+      console.error(err);
+    }
+  }
+
+  load();
+</script>
+</body>
+</html>
