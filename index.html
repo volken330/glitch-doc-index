@@ -32,6 +32,9 @@
     .count { margin-left: auto; }
     .error { padding: 10px 12px; border: 1px solid rgba(255,0,0,0.4); border-radius: 8px; }
     a { word-break: break-word; }
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px; }
+    .table-wrapper table { margin-top: 0; min-width: 900px; }
+    th, td:not([data-field="notes"]) { white-space: nowrap; }
   </style>
 </head>
 
@@ -90,6 +93,7 @@
 
   <div id="status"></div>
 
+  <div class="table-wrapper">
   <table aria-label="glitch index">
     <thead>
       <tr>
@@ -102,6 +106,7 @@
     </thead>
     <tbody id="tbody"></tbody>
   </table>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
